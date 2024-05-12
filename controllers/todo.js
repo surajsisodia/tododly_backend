@@ -6,9 +6,9 @@ exports.getTodoList = async (req, res) => {
 
     const query = `SELECT * FROM tasks`;
 
-    let result = await dbInstance().execute(query, [], {outFormat: oracledb.OUT_FORMAT_OBJECT});
+    let result = await dbInstance().execute(query, [], { outFormat: oracledb.OUT_FORMAT_OBJECT });
 
-    return res.status(200).json({ message: "Task fetched successfuly", data: result.rows});
+    return res.status(200).json({ message: "Task fetched successfuly", data: result.rows });
 
 }
 
@@ -58,7 +58,7 @@ exports.createTodoList = async (req, res) => {
 
         console.log(result.rows);
         dbInstance().commit();
-        return res.status(201).json({ message: "Task created successfuly", data: result.rows[0]});
+        return res.status(201).json({ message: "Task created successfuly", data: result.rows[0] });
     } catch (err) {
         console.log(err);
         return res.status(500).json({ "message": "Error Encountered" });
@@ -83,5 +83,22 @@ exports.updateTask = async (req, res) => {
     result = await dbInstance().execute('SELECT * FROM tasks WHERE task_id = :1', [task.task_id], { outFormat: oracledb.OUT_FORMAT_OBJECT });
 
     dbInstance().commit();
-    return res.status(200).json({ message: "Task updated successfuly", data: result.rows[0]});
+    return res.status(200).json({ message: "Task updated successfuly", data: result.rows[0] });
 }
+
+exports.deleteTodoList = async (req, res) => {
+
+    const task_id = req.query.task_id;
+    console.log("Delete Request for Task ID: " + task_id);
+
+    const query = `DELETE FROM tasks WHERE task_id = :1`;
+    const result = await dbInstance().execute(query,[task_id]);
+
+    const rowsAffected = result.rowsAffected;
+
+    if(rowsAffected == 0)
+        return res.status(404).json({message : "Task not found"});
+
+    dbInstance().commit();
+    return res.status(200).json({ message: "Task delete successfuly", deta: [] });
+}   
